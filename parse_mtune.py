@@ -10,7 +10,7 @@ result_code={
 	'3':'Incomplete',
 	'2':'Refer',
 	'1':'Pass',
-	'':'DNT'
+	'':''
 }
 site_code={
 	'1':'KNH',
@@ -57,16 +57,16 @@ for line in lines[3:-1]:
 		if con_right==sm_right:
 			correct+=1
 		else:
-			print ("%-8s %s [%s %s] [%s %s] %s"%(site,pid,result_code[con_right1_res],result_code[con_right2_res],
-				result_code[sm_right1_res],result_code[sm_right2_res],con_right==sm_right))
+			print ("%-8s %s right CON:[%s %s] SM:[%s %s]"%(site,pid,result_code[con_right1_res],result_code[con_right2_res],
+				result_code[sm_right1_res],result_code[sm_right2_res]))
 		total_complete+=1
 	if len(con_left)>0 and result_code[con_left]!='Incomplete' and \
 		len(sm_left)>0 and result_code[sm_left]!='Incomplete':
 		if con_left==sm_left:
 			correct+=1
 		else:
-			print ("%-8s %s [%s %s] [%s %s] %s"%(site,pid,result_code[con_left1_res],result_code[con_left2_res],
-				result_code[sm_left1_res],result_code[sm_left2_res],con_left==sm_left))
+			print ("%-8s %s left CON:[%s %s] SM:[%s %s]"%(site,pid,result_code[con_left1_res],result_code[con_left2_res],
+				result_code[sm_left1_res],result_code[sm_left2_res]))
 		total_complete+=1
 
 	if len(con_left)>0 and len(sm_left)>0:
@@ -82,6 +82,6 @@ for line in lines[3:-1]:
 	if result_code[con_left1_res]=='Incomplete' or result_code[con_left2_res]=='Incomplete':
 		con_incomplete+=1
 
-print ("%d / %d (%.2f)"%(correct,total_complete,correct/total_complete))
-print ("SM: %d / %d (%.2f) CON: %d / %d (%.2f)"%(sm_incomplete,total_all,sm_incomplete/total_all,
-	con_incomplete,total_all,con_incomplete/total_all))
+print ("Match rate: %d / %d (%.2f)"%(correct,total_complete,correct/total_complete))
+print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
+	sm_incomplete,total_all,sm_incomplete/total_all))
