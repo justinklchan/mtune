@@ -83,7 +83,8 @@ exclude_left=[152]
 exclude_right=[152]
 for snr_thresh in [10]:
 	for band_thresh in [2]:
-		for noise_thresh in [93,101]:
+		for noise_thresh in [101]:
+		# for noise_thresh in np.arange(70,120,5):
 			correct=0
 			total_complete=0
 			total_all=0
@@ -93,7 +94,6 @@ for snr_thresh in [10]:
 			sm_out=[]
 			con_out=[]
 			for line in lines[3:-1]:
-			# for line in lines[6:7]:
 				elts=line.split(',')
 				# print (elts)
 				site=site_code[elts[0]]
@@ -138,10 +138,13 @@ for snr_thresh in [10]:
 				else:
 					sm_right=sm_right1_res
 					attempt_right=1
+				if pid=='180':
+					attempt_right=1
 
 				if len(con_right)>0 and result_code[con_right]!='Incomplete' and \
 					len(sm_right)>0 and result_code[sm_right]!='Incomplete' and int(pid) not in exclude_right:
 					fname="%s-.*-right-%d"%(pid,attempt_right)
+					# print (fname,con_right,sm_right)
 					out=find_file(fname)
 					if out:
 						fsummary=open ('../kenya_files/'+out).read()
@@ -167,6 +170,7 @@ for snr_thresh in [10]:
 				if len(con_left)>0 and result_code[con_left]!='Incomplete' and \
 					len(sm_left)>0 and result_code[sm_left]!='Incomplete' and int(pid) not in exclude_left:
 					fname="%s-.*-left-%d"%(pid,attempt_left)
+					# print (fname)
 					out=find_file(fname)
 					if out:
 						fsummary=open ('../kenya_files/'+out).read()
@@ -207,7 +211,7 @@ for snr_thresh in [10]:
 			tn, fp, fn, tp = confusion_matrix(con_out, sm_out).ravel()
 			sensi=tp/(tp+fn)
 			speci=tn/(tn+fp)
-			# print ("sensi %.2f speci %.2f"%(sensi,speci))
+			print ("sensi %.2f speci %.2f"%(sensi,speci))
 
 			# print (results)
 			print ("%d %d %d Match rate: %d / %d (%.2f)"%(snr_thresh,band_thresh,noise_thresh,correct,total_complete,correct/total_complete))
