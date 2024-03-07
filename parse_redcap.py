@@ -1,4 +1,4 @@
-lines=open('../MTUNEPractice-ConventionalVSSmartp_DATA_2024-02-19_0518.csv').read().split('\n')
+lines=open('../MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-03_2234.csv').read().split('\n')
 
 correct=0
 total_complete=0
@@ -22,19 +22,23 @@ for line in lines[3:-1]:
 	# print (elts)
 	site=site_code[elts[0]]
 	pid=elts[1]
-	con_right1_done=elts[7]
-	sm_right1_done=elts[8]
-	con_right1_res=elts[9]
-	sm_right1_res=elts[10]
-	con_right2_res=elts[11]
-	sm_right2_res=elts[12]
-	con_left1_done=elts[13]
-	sm_left1_done=elts[14]
-	con_left1_res=elts[15]
-	sm_left1_res=elts[16]
-	con_left2_res=elts[17]
-	sm_left2_res=elts[18]
 
+	con_right1_done=elts[7]
+	con_right1_res=elts[8]
+	con_right2_res=elts[9]
+
+	sm_right1_done=elts[10]
+	sm_right1_res=elts[11]
+	sm_right2_res=elts[12]
+
+	con_left1_done=elts[13]
+	con_left1_res=elts[14]
+	con_left2_res=elts[15]
+
+	sm_left1_done=elts[16]
+	sm_left1_res=elts[17]
+	sm_left2_res=elts[18]
+	
 	if len(con_right2_res)>0:
 		con_right=con_right2_res
 	else:
@@ -85,3 +89,36 @@ for line in lines[3:-1]:
 print ("Match rate: %d / %d (%.2f)"%(correct,total_complete,correct/total_complete))
 print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
 	sm_incomplete,total_all,sm_incomplete/total_all))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
