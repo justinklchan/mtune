@@ -21,13 +21,16 @@ for dd in ['../kenya_files/']:
 			signal=elts1[53:57]
 			noise=elts1[57:61]
 			snrs=elts1[61:65]
-			snrs=[i if i != 'NaN' else '0' for i in snrs ]
-			signal=[i if i != 'NaN' else '0' for i in signal ]
-			noise=[i if i != 'NaN' else '0' for i in noise ]
+			cfit=elts1[81]
+			# snrs=[i if i != 'NaN' else '0' for i in snrs ]
+			# signal=[i if i != 'NaN' else '0' for i in signal ]
+			# noise=[i if i != 'NaN' else '0' for i in noise ]
 			thresh=10
 			freq=2
 			count=0
 			for k in snrs:
+				if k=='NaN':
+					continue
 				if math.ceil(float(k))>=thresh:
 					count+=1
 			result='Refer'
@@ -38,10 +41,10 @@ for dd in ['../kenya_files/']:
 				results[0]+=1
 			# print ("%s %d %d %d %d"%(i,math.ceil(float(signal[0])),math.ceil(float(signal[1])),math.ceil(float(signal[2])),math.ceil(float(signal[3]))))
 			# print ("%s %d %d %d %d"%(i,math.ceil(float(noise[0])),math.ceil(float(noise[1])),math.ceil(float(noise[2])),math.ceil(float(noise[3]))))
-			snrs2=[math.ceil(float(i)) for i in snrs]
-			if result=='Pass':
-				print ("%s %d %d %d %d %d %s"%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],np.mean(snrs2),result))
-				vals.append(np.mean(snrs2))
+			snrs2=[str(math.ceil(float(k)))  if k != 'NaN' else str(k) for k in snrs]
+			# if result=='Pass':
+			print ("%s %s %s %s %s %s %s"%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],result,cfit))
+				# vals.append(np.mean(snrs2))
 			# print (f)
 			# break
 print (thresh,freq,results)
