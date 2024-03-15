@@ -9,7 +9,7 @@ import itertools
 
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-03_2234'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-07_0840'
-fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0333'
+fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0802'
 lines=open('../'+fname+'.csv').read().split('\n')
 
 result_code={
@@ -73,11 +73,14 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	elif result=='2':
 		sm_out=(1)
 
+	counter=0
 	noise_result2='noise-pass'
 	for i in noise:
 		if i>=noise_thresh: # old thresh is 98, 93 is a good threshold
-			noise_result2='retry'
-			break
+			counter+=1
+
+	if counter>=2:
+		noise_result2='retry'
 
 	if result!=con and noise_result2=='noise-pass':
 		print (">>%s %d %d %d %d | %d %d %d %d %s %s"%(fname,math.ceil(float(snrs[0])),math.ceil(float(snrs[1])),
@@ -91,16 +94,17 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	# print ('"'+fname[:-12]+'",')
 	return sm_out,con_out,result,noise_result,noise_result2,snrs
 
+fout=open('logs.txt','w+')
 best_acc=0
 best_thresh=[0,0,0,0]
 exclude_left=[152]
 exclude_right=[152]
-for snr_thresh1 in [9]:
-	for snr_thresh2 in [6]:
-		for snr_thresh3 in [10]:
-			for snr_thresh4 in [6]:
-				for band_thresh in [3]:
-					for noise_thresh in [101]:
+for snr_thresh1 in [7]:
+	for snr_thresh2 in [7]:
+		for snr_thresh3 in [11]:
+			for snr_thresh4 in [12]:
+				for band_thresh in [2]:
+					for noise_thresh in [80]:
 					# for noise_thresh in np.arange(70,120,5):
 						correct=0
 						total_complete=0
@@ -171,12 +175,12 @@ for snr_thresh1 in [9]:
 									sm_out_elt,con_out_elt,sm_right,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh)
-									sm_out.append(sm_out_elt)
-									con_out.append(con_out_elt)
-									snr_out.append(snrs)
 									if noise_result2=='retry':
 										# print (out,'retry')
 										continue
+									sm_out.append(sm_out_elt)
+									con_out.append(con_out_elt)
+									snr_out.append(snrs)
 									# print ('"'+out[:-12]+'",'+noise_result)
 									if con_right==sm_right:
 										correct+=1
@@ -200,13 +204,13 @@ for snr_thresh1 in [9]:
 									sm_out_elt,con_out_elt,sm_left,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_left,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh)
-									sm_out.append(sm_out_elt)
-									con_out.append(con_out_elt)
-									snr_out.append(snrs)
 									if noise_result2=='retry':
 										# print (out,'retry')
 										continue
 									# print ('"'+out[:-12]+'",'+noise_result)
+									sm_out.append(sm_out_elt)
+									con_out.append(con_out_elt)
+									snr_out.append(snrs)
 									if con_left==sm_left:
 										correct+=1
 									# else:
@@ -232,16 +236,20 @@ for snr_thresh1 in [9]:
 
 						# conf=confusion_matrix(con_out, sm_out)
 						tn, fp, fn, tp = confusion_matrix(con_out, sm_out).ravel()
+						print (tp,fp,tn,fn)
 						sensi=tp/(tp+fn)
 						speci=tn/(tn+fp)
-						print ("sensi %.2f speci %.2f"%(sensi,speci))
+						print ("sensi %.3f speci %.3f"%(sensi,speci))
 
 						# print (results)
-						print ("%d %d %d %d %d %d Match rate: %d / %d (%.2f)"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh,correct,total_complete,correct/total_complete))
+						print ("%d %d %d %d %d %d Match rate: %d / %d (%.3f)"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh,correct,total_complete,correct/total_complete))
+						# fout.flush()
 						# print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
 							# sm_incomplete,total_all,sm_incomplete/total_all))
-						if correct/total_complete>best_acc:
+						# if correct/total_complete>best_acc:
+						if sensi>best_acc:
 							best_acc=correct/total_complete
+							# best_acc=sensi
 							best_thresh=[snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4]
 							best_band=band_thresh
 						# plt.figure()
@@ -251,7 +259,8 @@ for snr_thresh1 in [9]:
 print ('best ',best_acc)
 print (best_thresh)
 print (best_band)
-
+fout.flush()
+fout.close()
 
 
 
