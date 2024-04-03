@@ -6,12 +6,15 @@ from sklearn.metrics import confusion_matrix
 import sys
 import matplotlib.pyplot as plt
 import itertools
+from enum import Enum
 
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-03_2234'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-07_0840'
-fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0802'
+# fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0802'
+fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-04-03_0920'
 lines=open('../'+fname+'.csv').read().split('\n')
 
+offset=1
 result_code={
 	'3':'Incomplete',
 	'2':'Refer',
@@ -23,6 +26,12 @@ site_code={
 	'2':'Mathare',
 }
 
+class Metric(Enum):
+    Sensitivity = 1
+    Accuracy = 2
+
+optim_metric=Metric.Sensitivity
+
 fs=sorted(os.listdir('../kenya_files'))
 
 def find_file(fname):
@@ -31,7 +40,7 @@ def find_file(fname):
 			return i
 	return ''
 
-def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh):
+def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh,offset):
 	sm_out=0
 	con_out=0
 	lines=f.split('\n')
@@ -82,10 +91,10 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	if counter>=2:
 		noise_result2='retry'
 
-	if result!=con and noise_result2=='noise-pass':
-		print (">>%s %d %d %d %d | %d %d %d %d %s %s"%(fname,math.ceil(float(snrs[0])),math.ceil(float(snrs[1])),
-			math.ceil(float(snrs[2])),math.ceil(float(snrs[3])),
-			float(noise[0]),float(noise[1]),float(noise[2]),float(noise[3]),result_human,result_code[con]))
+	# if result!=con and noise_result2=='noise-pass':
+	# 	print (">>%s %d %d %d %d | %d %d %d %d %s %s"%(fname,math.ceil(float(snrs[0])),math.ceil(float(snrs[1])),
+	# 		math.ceil(float(snrs[2])),math.ceil(float(snrs[3])),
+	# 		float(noise[0]),float(noise[1]),float(noise[2]),float(noise[3]),result_human,result_code[con]))
 	# if result!=con:
 	# 	print ('>>',(fname,np.sum(noise),noise))
 	# else:
@@ -95,15 +104,16 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	return sm_out,con_out,result,noise_result,noise_result2,snrs
 
 fout=open('logs.txt','w+')
-best_acc=0
+best_metric=0
+best_noise=0
 best_thresh=[0,0,0,0]
 exclude_left=[152]
 exclude_right=[152]
-for snr_thresh1 in [7]:
-	for snr_thresh2 in [7]:
+for snr_thresh1 in [6]:
+	for snr_thresh2 in [6]:
 		for snr_thresh3 in [11]:
-			for snr_thresh4 in [12]:
-				for band_thresh in [2]:
+			for snr_thresh4 in [10]:
+				for band_thresh in [3]:
 					for noise_thresh in [80]:
 					# for noise_thresh in np.arange(70,120,5):
 						correct=0
@@ -116,25 +126,25 @@ for snr_thresh1 in [7]:
 						con_out=[]
 						for line in lines[3:-1]:
 							elts=line.split(',')
-							# print (elts)
-							site=site_code[elts[0]]
-							pid=elts[1]
 
-							con_right1_done=elts[7]
-							con_right1_res=elts[8]
-							con_right2_res=elts[9]
+							# site=site_code[elts[0]]
+							pid=elts[1-offset]
 
-							sm_right1_done=elts[10]
-							sm_right1_res=elts[11]
-							sm_right2_res=elts[12]
+							con_right1_done=elts[7-offset]
+							con_right1_res=elts[8-offset]
+							con_right2_res=elts[9-offset]
 
-							con_left1_done=elts[13]
-							con_left1_res=elts[14]
-							con_left2_res=elts[15]
+							sm_right1_done=elts[10-offset]
+							sm_right1_res=elts[11-offset]
+							sm_right2_res=elts[12-offset]
 
-							sm_left1_done=elts[16]
-							sm_left1_res=elts[17]
-							sm_left2_res=elts[18]
+							con_left1_done=elts[13-offset]
+							con_left1_res=elts[14-offset]
+							con_left2_res=elts[15-offset]
+
+							sm_left1_done=elts[16-offset]
+							sm_left1_res=elts[17-offset]
+							sm_left2_res=elts[18-offset]
 							
 							attempt_left=1
 							attempt_right=1
@@ -164,19 +174,18 @@ for snr_thresh1 in [7]:
 
 							if len(con_right)>0 and result_code[con_right]!='Incomplete' and \
 								len(sm_right)>0 and result_code[sm_right]!='Incomplete' and int(pid) not in exclude_right:
-								fname="%s-.*-right-%d"%(pid,attempt_right)
-								# print (fname,con_right,sm_right)
+								fname="-%s-.*-right-%d"%(pid,attempt_right)
 								out=find_file(fname)
 								if out:
 									fsummary=open ('../kenya_files/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
 									checkfit=np.loadtxt ('../kenya_files/'+out2)[-1]
+
 									sm_out_elt,con_out_elt,sm_right,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
-										band_thresh,noise_thresh)
+										band_thresh,noise_thresh,offset)
 									if noise_result2=='retry':
-										# print (out,'retry')
 										continue
 									sm_out.append(sm_out_elt)
 									con_out.append(con_out_elt)
@@ -203,7 +212,7 @@ for snr_thresh1 in [7]:
 									checkfit=np.loadtxt ('../kenya_files/'+out2)[-1]
 									sm_out_elt,con_out_elt,sm_left,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_left,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
-										band_thresh,noise_thresh)
+										band_thresh,noise_thresh,offset)
 									if noise_result2=='retry':
 										# print (out,'retry')
 										continue
@@ -246,19 +255,24 @@ for snr_thresh1 in [7]:
 						# fout.flush()
 						# print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
 							# sm_incomplete,total_all,sm_incomplete/total_all))
-						# if correct/total_complete>best_acc:
-						if sensi>best_acc:
-							best_acc=correct/total_complete
-							# best_acc=sensi
+
+						if optim_metric==Metric.Sensitivity:
+							metric=sensi
+						if optim_metric==Metric.Accuracy:
+							metric=correct/total_complete
+						if metric>best_metric:
+							best_metric=metric
 							best_thresh=[snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4]
 							best_band=band_thresh
+							best_noise=noise_thresh
 						# plt.figure()
 						# plt.hist(list(itertools.chain(*snr_out)))
 						# plt.show()
 
-print ('best ',best_acc)
+print ('best ',best_metric)
 print (best_thresh)
 print (best_band)
+print (best_noise)
 fout.flush()
 fout.close()
 

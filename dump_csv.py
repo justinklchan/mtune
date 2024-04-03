@@ -59,11 +59,11 @@ for dd in ['../kenya_files/']:
 				result2='Pass'
 			else:
 				result2='Refer'
-			if '150-Name-right' in i or '201' in i or '351-Name-left' in i:
+			# if '150-Name-right' in i or '201' in i or '351-Name-left' in i:
 			# 	print (noise)
 			# if noise[0]<=64 or noise[1]<=60 or noise[2]<=53 or noise[3]<=50:
-				print ("%s %d %d %d %d %s %s %s"%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],result,result2,cfit))
-				print (noise)
+			print ("%s %d %d %d %d %s %s %s"%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],result,result2,cfit))
+			# print (noise)
 			noises.append(noise)
 				# vals.append(np.mean(snrs2))
 			# print (f)
