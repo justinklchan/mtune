@@ -11,8 +11,9 @@ from enum import Enum
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-03_2234'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-07_0840'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0802'
-fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-04-03_0920'
-lines=open('../'+fname+'.csv').read().split('\n')
+# fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-04-03_0920'
+fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-06-18_0235'
+lines=open(fname+'.csv').read().split('\n')
 
 offset=1
 result_code={
@@ -32,7 +33,7 @@ class Metric(Enum):
 
 optim_metric=Metric.Sensitivity
 
-fs=sorted(os.listdir('../kenya_files'))
+fs=sorted(os.listdir('kenya_files'))
 
 def find_file(fname):
 	for i in fs:
@@ -177,10 +178,10 @@ for snr_thresh1 in [6]:
 								fname="-%s-.*-right-%d"%(pid,attempt_right)
 								out=find_file(fname)
 								if out:
-									fsummary=open ('../kenya_files/'+out).read()
+									fsummary=open ('kenya_files/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
-									checkfit=np.loadtxt ('../kenya_files/'+out2)[-1]
+									checkfit=np.loadtxt ('kenya_files/'+out2)[-1]
 
 									sm_out_elt,con_out_elt,sm_right,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
@@ -206,10 +207,10 @@ for snr_thresh1 in [6]:
 								# print (fname)
 								out=find_file(fname)
 								if out:
-									fsummary=open ('../kenya_files/'+out).read()
+									fsummary=open ('kenya_files/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
-									checkfit=np.loadtxt ('../kenya_files/'+out2)[-1]
+									checkfit=np.loadtxt ('kenya_files/'+out2)[-1]
 									sm_out_elt,con_out_elt,sm_left,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_left,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh,offset)
