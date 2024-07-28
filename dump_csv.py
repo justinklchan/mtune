@@ -2,11 +2,25 @@ import os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+from enum import Enum
+
+class Study(Enum):
+    Practice=1
+    Aim1=2
+
+study=Study.Aim1
+
+if study==Study.Practice:
+	fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-06-18_0235'
+	data_files='kenya_files_practice'
+elif study==Study.Aim1:
+	fname='MTUNEAim1-ConventionalVSSmartp_DATA_2024-07-27_1526'
+	data_files='kenya_files_aim1'
 
 noises=[]
 vals=[]
 results=[0,0]
-for dd in ['../kenya_files/']:
+for dd in [data_files+'/']:
 	fs=sorted(os.listdir(dd))
 
 	for i in fs:
@@ -45,10 +59,10 @@ for dd in ['../kenya_files/']:
 			# print ("%s %d %d %d %d"%(i,math.ceil(float(noise[0])),math.ceil(float(noise[1])),math.ceil(float(noise[2])),math.ceil(float(noise[3]))))
 			snrs2=[(math.ceil(float(k))) if k != 'NaN' else 0 for k in snrs]
 			
-			threshs=[7,7,11,12]
-			band=2
-			# threshs=[6,6,11,10]
-			# band=3
+			# threshs=[7,7,11,12]
+			# band=2
+			threshs=[6,6,11,10]
+			band=3
 			# threshs=[6,11,6,11]
 			# band=2
 			counter=0
@@ -62,22 +76,24 @@ for dd in ['../kenya_files/']:
 			# if '150-Name-right' in i or '201' in i or '351-Name-left' in i:
 			# 	print (noise)
 			# if noise[0]<=64 or noise[1]<=60 or noise[2]<=53 or noise[3]<=50:
-			print ("%s %d %d %d %d %s %s %s"%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],result,result2,cfit))
+			# print ('"%s",'%i[:-12])
+			print ('"%s", %d %d %d %s %s cfit: %s'%(i,snrs2[0],snrs2[1],snrs2[2],snrs2[3],result2,cfit))
 			# print (noise)
 			noises.append(noise)
 				# vals.append(np.mean(snrs2))
 			# print (f)
 			# break
-print (thresh,freq,results)
-print (threshs)
+# print (thresh,freq,results)
+# print (threshs)
 # plt.figure()
 # plt.hist(vals)
 # plt.show()
-noises=np.asarray(noises)
-print (np.min(noises[:,0]))
-print (np.min(noises[:,1]))
-print (np.min(noises[:,2]))
-print (np.min(noises[:,3]))
+
+# noises=np.asarray(noises)
+# print (np.min(noises[:,0]))
+# print (np.min(noises[:,1]))
+# print (np.min(noises[:,2]))
+# print (np.min(noises[:,3]))
 
 # plt.figure()
 # plt.hist(noises[:,0])

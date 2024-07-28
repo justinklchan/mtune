@@ -8,11 +8,25 @@ import matplotlib.pyplot as plt
 import itertools
 from enum import Enum
 
+class Study(Enum):
+    Practice=1
+    Aim1=2
+
+study=Study.Aim1
+
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-03_2234'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-07_0840'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-03-14_0802'
 # fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-04-03_0920'
-fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-06-18_0235'
+
+if study==Study.Practice:
+	fname='MTUNEPractice-ConventionalVSSmartp_DATA_2024-06-18_0235'
+	data_files='kenya_files_practice'
+	start_line=3
+elif study==Study.Aim1:
+	fname='MTUNEAim1-ConventionalVSSmartp_DATA_2024-07-27_1526'
+	data_files='kenya_files_aim1'
+	start_line=1
 lines=open(fname+'.csv').read().split('\n')
 
 offset=1
@@ -33,7 +47,7 @@ class Metric(Enum):
 
 optim_metric=Metric.Sensitivity
 
-fs=sorted(os.listdir('kenya_files'))
+fs=sorted(os.listdir(data_files))
 
 def find_file(fname):
 	for i in fs:
@@ -104,6 +118,12 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	# print ('"'+fname[:-12]+'",')
 	return sm_out,con_out,result,noise_result,noise_result2,snrs
 
+def get_id(pid):
+	try:
+		return int(pid)
+	except:
+		return 0
+
 fout=open('logs.txt','w+')
 best_metric=0
 best_noise=0
@@ -125,7 +145,7 @@ for snr_thresh1 in [6]:
 						snr_out=[]
 						sm_out=[]
 						con_out=[]
-						for line in lines[3:-1]:
+						for line in lines[start_line:-1]:
 							elts=line.split(',')
 
 							# site=site_code[elts[0]]
@@ -173,15 +193,17 @@ for snr_thresh1 in [6]:
 							if pid=='180':
 								attempt_right=1
 
-							if len(con_right)>0 and result_code[con_right]!='Incomplete' and \
-								len(sm_right)>0 and result_code[sm_right]!='Incomplete' and int(pid) not in exclude_right:
+							pid_int=get_id(pid)
+							if  len(con_right)>0 and result_code[con_right]!='Incomplete' and \
+								len(sm_right)>0 and result_code[sm_right]!='Incomplete' and pid_int not in exclude_right:
 								fname="-%s-.*-right-%d"%(pid,attempt_right)
 								out=find_file(fname)
+								print ('>',fname,out)
 								if out:
-									fsummary=open ('kenya_files/'+out).read()
+									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
-									checkfit=np.loadtxt ('kenya_files/'+out2)[-1]
+									checkfit=np.loadtxt (data_files+'/'+out2)[-1]
 
 									sm_out_elt,con_out_elt,sm_right,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
@@ -202,15 +224,15 @@ for snr_thresh1 in [6]:
 								# 	print ('err')
 
 							if len(con_left)>0 and result_code[con_left]!='Incomplete' and \
-								len(sm_left)>0 and result_code[sm_left]!='Incomplete' and int(pid) not in exclude_left:
+								len(sm_left)>0 and result_code[sm_left]!='Incomplete' and pid_int not in exclude_left:
 								fname="%s-.*-left-%d"%(pid,attempt_left)
 								# print (fname)
 								out=find_file(fname)
 								if out:
-									fsummary=open ('kenya_files/'+out).read()
+									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
-									checkfit=np.loadtxt ('kenya_files/'+out2)[-1]
+									checkfit=np.loadtxt (data_files+'/'+out2)[-1]
 									sm_out_elt,con_out_elt,sm_left,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_left,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh,offset)
@@ -245,14 +267,17 @@ for snr_thresh1 in [6]:
 							# 	con_incomplete+=1
 
 						# conf=confusion_matrix(con_out, sm_out)
+						print(con_out)
+						print (sm_out)
 						tn, fp, fn, tp = confusion_matrix(con_out, sm_out).ravel()
-						print (tp,fp,tn,fn)
+						print ('tp fp tn fn ',tp,fp,tn,fn)
 						sensi=tp/(tp+fn)
 						speci=tn/(tn+fp)
 						print ("sensi %.3f speci %.3f"%(sensi,speci))
 
 						# print (results)
-						print ("%d %d %d %d %d %d Match rate: %d / %d (%.3f)"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh,correct,total_complete,correct/total_complete))
+						print ("SNR threshs [%d %d %d %d] Band thresh: %d Noise thresh: %d"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh))
+						print("Match rate: %d / %d (%.3f)"%(correct,total_complete,correct/total_complete))
 						# fout.flush()
 						# print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
 							# sm_incomplete,total_all,sm_incomplete/total_all))
@@ -270,10 +295,10 @@ for snr_thresh1 in [6]:
 						# plt.hist(list(itertools.chain(*snr_out)))
 						# plt.show()
 
-print ('best ',best_metric)
-print (best_thresh)
-print (best_band)
-print (best_noise)
+print ('best metric ',optim_metric, best_metric)
+print ('best snr thresh ',best_thresh)
+print ('best band ',best_band)
+print ('best noise thresh ',best_noise)
 fout.flush()
 fout.close()
 
