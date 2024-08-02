@@ -39,7 +39,7 @@ for dd in [data_files+'/']:
 			cfit=elts1[81]
 			# snrs=[i if i != 'NaN' else '0' for i in snrs ]
 			# signal=[i if i != 'NaN' else '0' for i in signal ]
-			noise=[int(float(i)) if i != 'NaN' else 150 for i in noise ]
+			noise=[int(float(i)) if i != 'NaN' and i!= '-Infinity' else 150 for i in noise ]
 			noise=[i if i !=0 else 150 for i in noise]
 			thresh=10
 			freq=2

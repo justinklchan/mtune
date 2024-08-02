@@ -67,7 +67,7 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	noise_result=elts1[79].strip()
 	snrs=[math.ceil(float(i)) if i != 'NaN' else 0 for i in snrs ]
 	signal=[i if i != 'NaN' else '0' for i in signal ]
-	noise=[int(float(i)) if i != 'NaN' else 0 for i in noise ]
+	noise=[int(float(i)) if i != 'NaN' and i!='-Infinity' else 0 for i in noise ]
 
 	count=0
 	# for i in snrs:
@@ -119,17 +119,28 @@ def parse_summary(fname,f,con,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,ba
 	return sm_out,con_out,result,noise_result,noise_result2,snrs
 
 def get_id(pid):
-	try:
-		return int(pid)
-	except:
-		return 0
+	if study==Study.Practice:
+		try:
+			return int(pid)
+		except:
+			return -1
+	elif study==Study.Aim1:
+		try:
+			return int(pid.split('-')[-2])
+		except:
+			return -1
 
 fout=open('logs.txt','w+')
 best_metric=0
 best_noise=0
 best_thresh=[0,0,0,0]
-exclude_left=[152]
-exclude_right=[152]
+if study==Study.Practice:
+	exclude_left=[152]
+	exclude_right=[152]
+elif study==Study.Aim1:
+	exclude_left=[1]
+	exclude_right=[1]
+
 for snr_thresh1 in [6]:
 	for snr_thresh2 in [6]:
 		for snr_thresh3 in [11]:
@@ -190,15 +201,19 @@ for snr_thresh1 in [6]:
 							else:
 								sm_right=sm_right1_res
 								attempt_right=1
-							if pid=='180':
+							if study==Study.Practice and pid=='180':
 								attempt_right=1
 
 							pid_int=get_id(pid)
+							# print ('??? ',pid_int)
 							if  len(con_right)>0 and result_code[con_right]!='Incomplete' and \
 								len(sm_right)>0 and result_code[sm_right]!='Incomplete' and pid_int not in exclude_right:
-								fname="-%s-.*-right-%d"%(pid,attempt_right)
+								if study==Study.Practice:
+									fname="-%s-.*-right-%d"%(pid,attempt_right)
+								elif study==Study.Aim1:
+									fname="-%s-.*-right-%d"%(str(pid_int).zfill(4),attempt_right)
 								out=find_file(fname)
-								print ('>',fname,out)
+								# print('file ',fname,out)
 								if out:
 									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
@@ -208,6 +223,7 @@ for snr_thresh1 in [6]:
 									sm_out_elt,con_out_elt,sm_right,noise_result,noise_result2,snrs=parse_summary(
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh,offset)
+									# print ('>>>',snrs,noise_result2,result_code[sm_right])
 									if noise_result2=='retry':
 										continue
 									sm_out.append(sm_out_elt)
@@ -216,17 +232,20 @@ for snr_thresh1 in [6]:
 									# print ('"'+out[:-12]+'",'+noise_result)
 									if con_right==sm_right:
 										correct+=1
-									# else:
-									# 	print ("%-8s %s right CON:[%s %s] SM:[%s %s] %d\n"%(site,pid,result_code[con_right1_res],result_code[con_right2_res],
-									# 		result_code[sm_right1_res],result_code[sm_right2_res],checkfit))
+									else:
+									# print ("%s right CON:[%s %s] SM:[%s %s] %d"%(pid_int,result_code[con_right1_res],result_code[con_right2_res],
+									# 	result_code[sm_right1_res],result_code[sm_right2_res],checkfit))
+										print ("%s right CON:[%s] SM:[%s] %d"%(pid_int,result_code[con_right],result_code[sm_right],checkfit))
 									total_complete+=1
 								# else:
 								# 	print ('err')
 
 							if len(con_left)>0 and result_code[con_left]!='Incomplete' and \
 								len(sm_left)>0 and result_code[sm_left]!='Incomplete' and pid_int not in exclude_left:
-								fname="%s-.*-left-%d"%(pid,attempt_left)
-								# print (fname)
+								if study==Study.Practice:
+									fname="-%s-.*-left-%d"%(pid,attempt_left)
+								elif study==Study.Aim1:
+									fname="-%s-.*-left-%d"%(str(pid_int).zfill(4),attempt_left)
 								out=find_file(fname)
 								if out:
 									fsummary=open (data_files+'/'+out).read()
@@ -240,19 +259,22 @@ for snr_thresh1 in [6]:
 										# print (out,'retry')
 										continue
 									# print ('"'+out[:-12]+'",'+noise_result)
+									# print (out,snrs)
 									sm_out.append(sm_out_elt)
 									con_out.append(con_out_elt)
 									snr_out.append(snrs)
+									# print ('>',pid_int,'left',con_left,sm_left)
 									if con_left==sm_left:
 										correct+=1
-									# else:
-									# 	print ("%-8s %s left CON:[%s %s] SM:[%s %s] %d\n"%(site,pid,result_code[con_left1_res],result_code[con_left2_res],
-									# 		result_code[sm_left1_res],result_code[sm_left2_res],checkfit))
+									else:
+									# print ("%d left CON:[%s %s] SM:[%s %s] %d"%(pid_int,result_code[con_left1_res],result_code[con_left2_res],
+									# 	result_code[sm_left1_res],result_code[sm_left2_res],checkfit))
+										print ("%d left CON:[%s] SM:[%s] %d"%(pid_int,result_code[con_left],result_code[sm_left],checkfit))
 									total_complete+=1
 								# else:
 								# 	print ('err')
 
-							# print ('>>',con_left,sm_left,con_right,sm_right)
+							# print ('>>',pid,con_left,sm_left,con_right,sm_right)
 							# if con_left and sm_left and len(con_left)>0 and len(sm_left)>0:
 							# 	total_all+=1
 							# if con_right and sm_right and len(con_right)>0 and len(sm_right)>0:
@@ -267,13 +289,13 @@ for snr_thresh1 in [6]:
 							# 	con_incomplete+=1
 
 						# conf=confusion_matrix(con_out, sm_out)
-						print(con_out)
-						print (sm_out)
+						# print(con_out)
+						# print (sm_out)
 						tn, fp, fn, tp = confusion_matrix(con_out, sm_out).ravel()
-						print ('tp fp tn fn ',tp,fp,tn,fn)
+						# print ('tp fp tn fn ',tp,fp,tn,fn)
 						sensi=tp/(tp+fn)
 						speci=tn/(tn+fp)
-						print ("sensi %.3f speci %.3f"%(sensi,speci))
+						print ("Sensitivity: %d / %d (%.3f) Specificity: %d / %d (%.3f)"%(tp,tp+fn,sensi,tn,tn+fp,speci))
 
 						# print (results)
 						print ("SNR threshs [%d %d %d %d] Band thresh: %d Noise thresh: %d"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh))

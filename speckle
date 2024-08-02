@@ -1,0 +1,164 @@
+speckle
+eye testing
+https://iypt.ru/wp-content/uploads/2019/08/Laser-speckle-experiments-for-students.pdf
+
+seed moisture sensing
+
+heartbeats
+
+speech reconstruction
+
+geophone breathing in office environment?
+---------------------
+
+Clinical pupillometers and other high performance pupillometry systems utilize near-infrared light to measure the pupil because melanin of the iris refects longer wavelengths and
+appears bright, which signifcantly contrasts the dark pupil. Near infrared imaging is not possible in smartphone
+RGB cameras because smartphone cameras have built-in flters that cutof light outside the visible spectrum to
+improve image quality for photography. Tis paper addresses the challenge of performing pupillometry within the
+light spectrum of commodity RGB cameras.
+
+head impulse test
+pupil vs iris
+nystagmus glasses
+infrared glasses
+
+Head Impulse Test | Peripheral Vestibular Dysfunction
+=> has disease if eye and head move together (this is called corrective saccade)
+
+Joint Position Sense Assessment | Cervicogenic Dizziness
+can patient move head, and return it to the same position
+
+Dix Hallpike Test | Posterior BPPV
+=> inner ear problem, causes vertigo (can be due to ear infection or head truma, debris in cochlea)
+
+Modified Epley Maneuver | Posterior BPPV Treatment
+
+------------------------
+
+36 weeks => 9 months
+
+4 times
+
+4065 control
+7013 saccade
+1247 saccade
+1750 head move
+
+30 hz
+
+send 200hz tone
+can you average, but you need to search for the best sample
+
+
+EMREO length = 6
+goodFits 200 length
+
+
+Published in: IEEE Pervasive Computing ( Volume: 23, Issue: 1, Jan.-March 2024)
+03 June 2024
+Date of current version 30 May 2024.
+~ 14 July
+
+Published in: IEEE Pervasive Computing ( Volume: 23, Issue: 2, April-June 2024)
+28 June 2024
+Date of current version 25 June 2024.
+~7 July
+
+17 april
+
+25 july
+9 july
+3 july
+28 june
+
+project for yifeng, backup project for kevin
+
+something with an ML system
+Sony research award
+Tianxing li soil
+Ideas (laser speckle, plant, aging)
+
+----------------------------------------
+
+ear tips
+
+1500 words a day
+
+The future of millimeter wave enabled smart speakers
+Check the mobicom paper demonstrating you can use mmWave for some stuff. 
+How can all of the mmWave capabilities be enabled in smart speaker form
+Millimeter wave as a kinect or for in the dark monitoring 
+Overcoming short range limitations
+
+----------------------------------
+
+fetal health sensing
+seizures
+COPD breathing. sleep disease detection.
+
+Millimeter wave
+
+elderly monitoring (gait analysis)
+blood pressure monitoring
+eclampsia, seizures.
+
+smart speakers in offices and dorm rooms (new deployment environment) --- continuous breathing, cough, sneeze sounds
+
+----------------------------------
+
+Smart home hubs for comprehensive fetal sensing
+
+Challenges:
+mmWave -> skeletal pose estimation
+	can we pair the radio data with ground truth accelerometer readings? or camera readings?
+Generative AI data 
+	Have actors act out a seizure -> use this to generate synthetic data
+	Combine this with data in the wild
+
+budget
+timeline
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
