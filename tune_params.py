@@ -45,7 +45,7 @@ class Metric(Enum):
     Sensitivity = 1
     Accuracy = 2
 
-optim_metric=Metric.Sensitivity
+optim_metric=Metric.Accuracy
 
 fs=sorted(os.listdir(data_files))
 
@@ -138,15 +138,15 @@ if study==Study.Practice:
 	exclude_left=[152]
 	exclude_right=[152]
 elif study==Study.Aim1:
-	exclude_left=[1]
-	exclude_right=[1]
+	exclude_left=[]
+	exclude_right=[]
 
-for snr_thresh1 in [6]:
-	for snr_thresh2 in [6]:
-		for snr_thresh3 in [11]:
-			for snr_thresh4 in [10]:
-				for band_thresh in [3]:
-					for noise_thresh in [80]:
+for snr_thresh1 in [7]:
+	for snr_thresh2 in [4]:
+		for snr_thresh3 in [5]:
+			for snr_thresh4 in [4]:
+				for band_thresh in [2]:
+					for noise_thresh in [800]:
 					# for noise_thresh in np.arange(70,120,5):
 						correct=0
 						total_complete=0
@@ -180,7 +180,8 @@ for snr_thresh1 in [6]:
 							
 							attempt_left=1
 							attempt_right=1
-
+							pid_int=get_id(pid)
+							# print (elts)
 							if len(con_right2_res)>0:
 								con_right=con_right2_res
 							else:
@@ -189,12 +190,14 @@ for snr_thresh1 in [6]:
 								con_left=con_left2_res
 							else:
 								con_left=con_left1_res
+
 							if len(sm_left2_res)>0:
 								sm_left=sm_left2_res
 								attempt_left=2
 							else:
 								sm_left=sm_left1_res
 								attempt_left=1
+
 							if len(sm_right2_res)>0:
 								sm_right=sm_right2_res
 								attempt_right=2
@@ -204,8 +207,6 @@ for snr_thresh1 in [6]:
 							if study==Study.Practice and pid=='180':
 								attempt_right=1
 
-							pid_int=get_id(pid)
-							# print ('??? ',pid_int)
 							if  len(con_right)>0 and result_code[con_right]!='Incomplete' and \
 								len(sm_right)>0 and result_code[sm_right]!='Incomplete' and pid_int not in exclude_right:
 								if study==Study.Practice:
@@ -226,10 +227,11 @@ for snr_thresh1 in [6]:
 									# print ('>>>',snrs,noise_result2,result_code[sm_right])
 									if noise_result2=='retry':
 										continue
+									
 									sm_out.append(sm_out_elt)
 									con_out.append(con_out_elt)
 									snr_out.append(snrs)
-									# print ('"'+out[:-12]+'",'+noise_result)
+
 									if con_right==sm_right:
 										correct+=1
 									else:
@@ -247,6 +249,7 @@ for snr_thresh1 in [6]:
 								elif study==Study.Aim1:
 									fname="-%s-.*-left-%d"%(str(pid_int).zfill(4),attempt_left)
 								out=find_file(fname)
+								# print (fname)
 								if out:
 									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
@@ -258,6 +261,9 @@ for snr_thresh1 in [6]:
 									if noise_result2=='retry':
 										# print (out,'retry')
 										continue
+									if study==Study.Aim1 and pid_int==3:
+										sm_left='1'
+										snrs=[6,6,11,10]
 									# print ('"'+out[:-12]+'",'+noise_result)
 									# print (out,snrs)
 									sm_out.append(sm_out_elt)
@@ -295,11 +301,11 @@ for snr_thresh1 in [6]:
 						# print ('tp fp tn fn ',tp,fp,tn,fn)
 						sensi=tp/(tp+fn)
 						speci=tn/(tn+fp)
-						print ("Sensitivity: %d / %d (%.3f) Specificity: %d / %d (%.3f)"%(tp,tp+fn,sensi,tn,tn+fp,speci))
+						print("Agreement: %d of %d (%.1f%%)"%(correct,total_complete,100*correct/total_complete))
+						print ("Sensitivity: %d of %d (%.1f%%)\nSpecificity: %d of %d (%.1f%%)"%(tp,tp+fn,100*sensi,tn,tn+fp,100*speci))
 
 						# print (results)
 						print ("SNR threshs [%d %d %d %d] Band thresh: %d Noise thresh: %d"%(snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,band_thresh,noise_thresh))
-						print("Match rate: %d / %d (%.3f)"%(correct,total_complete,correct/total_complete))
 						# fout.flush()
 						# print ("CON incomplete: %d / %d (%.2f)\nSM incomplete: %d / %d (%.2f)"%(con_incomplete,total_all,con_incomplete/total_all,
 							# sm_incomplete,total_all,sm_incomplete/total_all))
