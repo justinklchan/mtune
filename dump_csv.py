@@ -22,7 +22,6 @@ vals=[]
 results=[0,0]
 for dd in [data_files+'/']:
 	fs=sorted(os.listdir(dd))
-
 	for i in fs:
 		if 'summary' in i:
 			f=open(dd+'/'+i).read()

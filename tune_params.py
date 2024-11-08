@@ -141,12 +141,17 @@ elif study==Study.Aim1:
 	exclude_left=[]
 	exclude_right=[]
 
-for snr_thresh1 in [7]:
+# 7,4,5,4 (2)
+# for snr_thresh1 in np.arange(4,11):
+# 	for snr_thresh2 in np.arange(4,11):
+# 		for snr_thresh3 in np.arange(4,11):
+# 			for snr_thresh4 in np.arange(4,11):
+for snr_thresh1 in [5]:
 	for snr_thresh2 in [4]:
-		for snr_thresh3 in [5]:
+		for snr_thresh3 in [4]:
 			for snr_thresh4 in [4]:
-				for band_thresh in [2]:
-					for noise_thresh in [800]:
+				for band_thresh in [3]:
+					for noise_thresh in [990]:
 					# for noise_thresh in np.arange(70,120,5):
 						correct=0
 						total_complete=0
@@ -216,6 +221,7 @@ for snr_thresh1 in [7]:
 								out=find_file(fname)
 								# print('file ',fname,out)
 								if out:
+									# print ('APPEND R ',noise_result2)
 									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
 									out2=out2.replace('csv','txt')
@@ -225,9 +231,9 @@ for snr_thresh1 in [7]:
 										out,fsummary,con_right,snr_thresh1,snr_thresh2,snr_thresh3,snr_thresh4,
 										band_thresh,noise_thresh,offset)
 									# print ('>>>',snrs,noise_result2,result_code[sm_right])
+									
 									if noise_result2=='retry':
 										continue
-									
 									sm_out.append(sm_out_elt)
 									con_out.append(con_out_elt)
 									snr_out.append(snrs)
@@ -249,7 +255,7 @@ for snr_thresh1 in [7]:
 								elif study==Study.Aim1:
 									fname="-%s-.*-left-%d"%(str(pid_int).zfill(4),attempt_left)
 								out=find_file(fname)
-								# print (fname)
+								# print('file ',fname,out)
 								if out:
 									fsummary=open (data_files+'/'+out).read()
 									out2=out.replace('summary','checkfit')
@@ -261,11 +267,12 @@ for snr_thresh1 in [7]:
 									if noise_result2=='retry':
 										# print (out,'retry')
 										continue
-									if study==Study.Aim1 and pid_int==3:
-										sm_left='1'
-										snrs=[6,6,11,10]
+									# if study==Study.Aim1 and pid_int==3:
+									# 	sm_left='1'
+									# 	snrs=[6,6,11,10]
 									# print ('"'+out[:-12]+'",'+noise_result)
 									# print (out,snrs)
+									# print ('APPEND L')
 									sm_out.append(sm_out_elt)
 									con_out.append(con_out_elt)
 									snr_out.append(snrs)
